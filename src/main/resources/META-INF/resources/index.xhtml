@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<h:html xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title> Account management</title>
+
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body>
+
+        <div class="card">
+            <h:form id="form-count">
+                <p:growl id="messages" showDetail="true"/>
+                <div class=" card">
+                    <p:menubar>
+                        <p:menuitem value="Home" icon="pi pi-fw pi-user" update=":form-count:count-table"
+                                    actionListener="#{countController.loadData}"/>
+                        <p:menuitem value="New Count" icon="pi pi-fw pi-plus" update=":form-model:count-window"
+                                    actionListener="#{countController.addCount}"
+                                    oncomplete="PF('windowModelCount').show()"/>
+                    </p:menubar>
+
+                </div>
+                <div class="card">
+                    <p:dataTable value="#{countController.counts}" var="count" id="count-table"
+                                 widgetVar="countTable">
+                        <f:facet name="header">
+
+                            <div class="flex justify-content-center flex-wrap card-container yellow-container">
+                                <div class=" flex align-items-center justify-content-center
+                                            w-20rem h-4rem bg-yellow-500 font-bold text-gray-900 border-round m-2">
+                                    <h2> Bank account system</h2>
+                                </div>
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="Id Count">
+                            <h:outputText value="#{count.id}"/>
+                        </p:column>
+                        <p:column headerText="UserName">
+                            <h:outputText value="#{count.nameUser}"/>
+                        </p:column>
+                        <p:column headerText="Count Type">
+                            <h:outputText value="#{count.countType}"/>
+                        </p:column>
+                        <p:column headerText="Balance">
+                            <h:outputText value="#{count.balance}">
+                                <f:convertNumber type="currency" currencySymbol="$"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton value="edit" icon="pi pi-pencil" update=":form-model:count-window"
+                                             oncomplete="PF('windowModelCount').show()" process="@this"
+                                             class="ui-button-primary" style="margin-right: .5rem">
+
+                                <f:setPropertyActionListener target="#{countController.countSelected}"
+                                                             value="#{count}"/>
+                                <p:resetInput target=":form-model:count-window"/>
+                            </p:commandButton>
+                            <p:commandButton value="delete" icon="pi pi-trash" update=":form-model:count-window"
+                                             oncomplete="PF('deleteCountWindow').show()" process="@this"
+                                             class="ui-button-danger">
+                                <f:setPropertyActionListener target="#{countController.countSelected}"
+                                                             value="#{count}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+
+            <h:form id="form-model">
+                <p:dialog header="Count Details" showEffect="fade"
+                          modal="true" widgetVar="windowModelCount"
+                          responsive="true">
+                    <p:outputPanel id="count-window" class="uid-fluid">
+                        <div class="field">
+                            <p:outputLabel for="name"> Name</p:outputLabel>
+                            <p:inputText id="name" value="#{countController.countSelected.nameUser}"
+                                         required="true"/>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="countType">Account Type</p:outputLabel>
+                            <p:selectOneMenu id="countType" value="#{countController.countSelected.countType}">
+                                <f:selectItem itemLabel="Choose" itemValue=""/>
+                                <f:selectItem itemLabel="Saving" itemValue="Saving"/>
+                                <f:selectItem itemLabel="Credit" itemValue="Credit"/>
+                                <f:selectItem itemLabel="Investment" itemValue="Investment"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="balance"> Balance</p:outputLabel>
+                            <p:inputNumber id="balance" value="#{countController.countSelected.balance}"
+                                           required="true"/>
+                        </div>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Cancel" icon=" pi pi-times" onclick="PF('windowModelCount').hide()"
+                                         class="ui-button-secondary" type="button"/>
+                        <p:commandButton value="Save" icon="pi pi-check" actionListener="#{countController.saveCount}"
+                                         process="count-window @this"/>
+
+                    </f:facet>
+
+
+                </p:dialog>
+                <p:confirmDialog widgetVar="deleteCountWindow" showEffect="fade" width="300"
+                                 message=" Do you want to remove account"
+                                 header="confirm" severity="warm">
+                    <p:commandButton value="si" icon="pi pi-check" actionListener="#{countController.removeCount}"
+                                     process="@this" oncomplete="PF('deleteCountWindow').hide()"/>
+                    <p:commandButton value="no" icon="pi pi-times" type="button"
+                                     process="@this" onclick="PF('deleteCountWindow').hide()" styleClass="ui-button-secondary"/>
+                </p:confirmDialog>
+
+            </h:form>
+
+
+        </div>
+
+
+    </h:body>
+
+
+</h:html>
